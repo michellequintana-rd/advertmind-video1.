@@ -470,7 +470,8 @@ input:focus, select:focus {
 </div>
 
 <script>
-const SHEET_WEBHOOK = "https://script.google.com/a/macros/penadefillo.com/s/AKfycbyOmee0onOIk-bL8gGDNiyXWx5Rg4mWRejQ4q-5_3s0rouUIomtpjoyF_zfsm-6MdIZ/exec";
+const JSONBIN_API_KEY = "$2a$10$u4ha.HWfYajXYWkD/gREO.Jgzi64ApZumd10kqq9dmgDb9edfA98q";
+const JSONBIN_URL = "https://api.jsonbin.io/v3/b";
 
 let userData = {};
 let sessionStart = null;
@@ -550,7 +551,6 @@ function marcarCompletado() {
 }
 
 function enviarDatos(evento, minuto, videoCompletado) {
-  if (SHEET_WEBHOOK === "PEGA_TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI") return;
   const payload = {
     nombre: userData.nombre,
     apellido: userData.apellido,
@@ -565,10 +565,15 @@ function enviarDatos(evento, minuto, videoCompletado) {
     hora: new Date().toLocaleTimeString('es-DO'),
     session_inicio: sessionStart
   };
-  fetch(SHEET_WEBHOOK, {
+
+  fetch(JSONBIN_URL, {
     method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_API_KEY,
+      'X-Bin-Name': evento + '_' + (userData.correo || 'usuario') + '_' + new Date().toISOString().slice(0,10),
+      'X-Collection-Name': 'PenaDefillo_VideoTracking'
+    },
     body: JSON.stringify(payload)
   }).catch(() => {});
 }
